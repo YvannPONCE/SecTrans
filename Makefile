@@ -2,19 +2,13 @@
 
 CC = g++
 CFLAGS = -Wall -std=c++11
-SRCS = main.cpp
 BUILDDIR = ./build
-OBJS = $(patsubst %.cpp, $(BUILDDIR)/%.o, $(SRCS))
-TARGET = secTrans
+TARGET = secTrans.exe
 LIBDIR = ./lib
-LIBNAME = server
 
-$(TARGET): $(OBJS) $(LIBDIR)/lib$(LIBNAME).so
-	$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(LIBDIR) -l$(LIBNAME) -Wl,-rpath=$(LIBDIR)
-
-$(BUILDDIR)/%.o: %.cpp
+${TARGET}: src/main.cpp src/server.cpp 
 	@mkdir -p $(BUILDDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $^  -I./../header -ldl -o $(BUILDDIR)/$@
 
 .PHONY: all clean
 
