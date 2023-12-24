@@ -8,7 +8,7 @@ private:
     int _port;
     void* _serverHandler;
 
-    void* loadLibrary(std::string libraryPath);
+    void loadLibrary(std::string libraryPath);
 
 public:
     // Constructor
@@ -16,7 +16,7 @@ public:
     int stop();
 
     /* read message sent by client */
-    int getmsg(char msg_read[1024]);
+    std::string getmsg();
 };
 
 #endif
