@@ -2,13 +2,15 @@
 #include <cstdlib>
 #include <dlfcn.h>
 #include <string>
+#include <vector>
 
 #include "../header/server.h"
 #include "../include/server.h"
 
 #define CHUNK_SIZE 1024
 
-Server::Server(int port) : _port(port) {
+Server::Server(int port) : _port(port) 
+{
     loadLibrary("lib/libserver.so");
     typedef int (*startserverFunction)(int);
     startserverFunction startserver = reinterpret_cast<startserverFunction>(dlsym(_serverHandler, "startserver"));
@@ -21,7 +23,8 @@ Server::Server(int port) : _port(port) {
     std::cout << "Server started on port "<< _port << std::endl;
 }
 
-int Server::stop() {
+int Server::stop() 
+{
     typedef int (*stopserverFunction)();
     stopserverFunction stopserver = reinterpret_cast<stopserverFunction>(dlsym(_serverHandler, "stopserver"));
     if (!stopserver) {
@@ -35,8 +38,20 @@ int Server::stop() {
     return EXIT_SUCCESS;
 }
 
+std::vector<std::string> Server::getfile()
+{
+    std::vector<std::string> fileData;
+    std::string buffer;
+    while ((buffer = getStringMsg()) != "###EOF###") {
+        fileData.push_back(buffer);
+    }
+
+    return fileData;
+}
+
 /* read message sent by client */
-std::string Server::getmsg() {
+std::string Server::getStringMsg() 
+{
     char message[CHUNK_SIZE];
 
     typedef int (*getmsgFunction)(const char msg[CHUNK_SIZE]);
@@ -47,8 +62,7 @@ std::string Server::getmsg() {
         return "";
     }
     getmsg(message);
-    return  std::string(message);
-    
+    return  std::string(message);  
 }
 
 void Server::loadLibrary(std::string libraryPath)

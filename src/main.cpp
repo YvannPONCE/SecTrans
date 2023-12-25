@@ -1,11 +1,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 #include "./../header/main.h"
 #include "./../header/server.h"
 #include "./../header/client.h"
-#include "./../header/fileREader.h"
+#include "./../header/fileManager.h"
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
@@ -13,7 +14,8 @@ int main() {
     Server server(5001);
     std::cin.get();
 
-    std::vector<std::string> fileData = fileREader::read("./test.txt");
+    std::vector<std::string> fileData = fileManager::read( std::filesystem::path("./test.txt") );
+    fileData = fileManager::wrap(fileData);
 
     Client client(5001);
     for (const std::string& buffer : fileData) {
@@ -21,8 +23,8 @@ int main() {
     }
     std::cin.get();
 
-    std::string message = server.getmsg();
-    std::cout << "Received : " << message << std::endl;
+    std::vector<std::string> file = server.getfile();
+    fileManager::print(file);
     std::cin.get();
     
     server.stop();

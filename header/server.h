@@ -8,6 +8,7 @@ private:
     int _port;
     void* _serverHandler;
 
+    std::string getStringMsg();
     void loadLibrary(std::string libraryPath);
 
 public:
@@ -16,7 +17,7 @@ public:
     int stop();
 
     /* read message sent by client */
-    std::string getmsg();
+    std::vector<std::string> getfile();
 };
 
 #endif

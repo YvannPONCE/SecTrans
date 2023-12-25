@@ -1,12 +1,12 @@
 # Makefile
 
 CC = g++
-CFLAGS = -Wall -std=c++11
+CFLAGS = -Wall -std=c++17
 BUILDDIR = ./build
 TARGET = secTrans.exe
 LIBDIR = ./lib
 
-${TARGET}: src/main.cpp src/server.cpp src/client.cpp src/fileReader.cpp
+${TARGET}: src/main.cpp src/server.cpp src/client.cpp src/fileManager.cpp
 	@mkdir -p $(BUILDDIR)
 	$(CC) $(CFLAGS) $^  -I./../header -ldl -o $(BUILDDIR)/$@
 
