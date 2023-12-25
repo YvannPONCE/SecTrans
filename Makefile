@@ -6,7 +6,7 @@ BUILDDIR = ./build
 TARGET = secTrans.exe
 LIBDIR = ./lib
 
-${TARGET}: src/main.cpp src/server.cpp src/client.cpp
+${TARGET}: src/main.cpp src/server.cpp src/client.cpp src/fileReader.cpp
 	@mkdir -p $(BUILDDIR)
 	$(CC) $(CFLAGS) $^  -I./../header -ldl -o $(BUILDDIR)/$@
 
