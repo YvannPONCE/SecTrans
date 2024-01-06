@@ -9,12 +9,12 @@
 #define CHUNK_SIZE 1024
 
 // Constructor
-Client::Client(int port) : _port(port) {
+Client::Client() {
     loadLibrary("lib/libclient.so");
 }
 
 /* send message (maximum size: 1024 bytes) */
-int Client::sendmsg(std::string message)
+int Client::sendmsg(int port, std::string message)
 {
     typedef int (*sndmsgFunction)(const char msg[1024], int port);
     sndmsgFunction sndmsg = reinterpret_cast<sndmsgFunction>(dlsym(_clientHandler, "sndmsg"));
@@ -27,8 +27,8 @@ int Client::sendmsg(std::string message)
         std::cerr << "The message is too big" << std::endl;
         return EXIT_FAILURE;
     }
-    sndmsg(message.c_str(), _port);
-    sndmsg("###EOF###", _port);
+    sndmsg(message.c_str(), port);
+    sndmsg("###EOF###", port);
     std::cout << "Sent : " << std::endl << message << "\n" << std::endl;
     return EXIT_SUCCESS;
 }

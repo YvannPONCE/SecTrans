@@ -5,7 +5,10 @@
 
 class Wrapper {
 public:
-    static std::string wrap(std::string hostname, int port, std::string pubKey);
+    static std::string getType(std::string request);
+    static std::string wrapINIT(int port, std::string pubKey);
+    static std::string unwrappPUBK(std::string request);
+    static std::string wrapFILE(std::string data);
 private:
 };
 

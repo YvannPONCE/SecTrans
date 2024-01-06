@@ -13,8 +13,6 @@ int main() {
 
     Engine engine;
     Server server(5001);
-    std::cout << "Listening on " << 5001 << "..." << std::endl;
-    
     while (true)
     {
         std::string request = server.getRequest();

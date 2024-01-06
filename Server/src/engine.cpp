@@ -5,33 +5,27 @@
 #include "../header/engine.h"
 #include "../header/wrapper.h"
 #include "../header/encryptionManager.h"
+#include "../header/client.h"
 
-Engine::Engine(): _connexions(), _encryptionManager() {
-
-}
+Engine::Engine(): _connexions(), _encryptionManager(), _client() {}
 
 void Engine::processRequest(std::string request){
     std::string type = Wrapper::getType(request);
     if(type == "INIT"){
-        std::cout << "INIT" << std::endl;
-        std::string hostname; 
         int port; 
         std::string clientPublicKey; 
-        Wrapper::unWrappInit(request, hostname, port, clientPublicKey);
-
-        std::cout << hostname << std::endl << port << std::endl << clientPublicKey << std::endl;
+        Wrapper::unWrappInit(request, port, clientPublicKey);
 
         _encryptionManager.setClientPublicKey(clientPublicKey);
 
-
+        std::string response = Wrapper::wrapPUBK(_encryptionManager.getPublicKey());
+        _client.sendmsg(port, response);
     }
     else if (type == "CONN")
     {
-        std::cout << "CONN" << std::endl;
     }
     else
     {
-        std::cout << "None" << std::endl;
     }
     
     

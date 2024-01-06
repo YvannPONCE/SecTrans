@@ -6,7 +6,7 @@ BUILDDIR = ./build
 TARGET = client.exe
 LIBDIR = ./lib
 
-${TARGET}: src/main.cpp src/client.cpp src/fileManager.cpp src/wrapper.cpp src/encryptionManager.cpp
+${TARGET}: src/main.cpp src/client.cpp src/fileManager.cpp src/wrapper.cpp src/encryptionManager.cpp src/server.cpp src/engine.cpp
 	@mkdir -p $(BUILDDIR)
 	$(CC) $(CFLAGS) $^  -I./../header -lssl -lcrypto -ldl -o $(BUILDDIR)/$@
 

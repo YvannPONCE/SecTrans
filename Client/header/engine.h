@@ -1,23 +1,26 @@
 // engine.h
-#include "object/connexionDetails.h"
 #include "./encryptionManager.h"
 #include "./client.h"
+#include "./server.h"
+#include "./fileManager.h"
 
 #ifndef ENGINE_H
 #define ENGINE_H
 
 class Engine {
 private:
-    std::vector<ConnexionDetails> _connexions;
     EncryptionManager  _encryptionManager;
     Client _client;
-    void initConnexion();
-    void sendPubKey(std::string request);
+    Server _server;
+
+    void startConnexion();
 
 public:
     Engine();
     
+    void sendRequest(const std::string &type, const std::string &data);
     void processRequest(std::string request);
+    std::string waitForResponse();
 };
 
 #endif

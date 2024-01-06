@@ -1,7 +1,15 @@
-namespace fileManager {
+// fileManager.h
 
-    std::vector<std::string> read(std::filesystem::path filePath);
-    std::vector<std::string> wrap(std::vector<std::string> fileData);
-    void print(std::vector<std::string> fileData);
+#include <filesystem>
 
-}
+#ifndef FileManager_H
+#define FileManager_H
+
+class FileManager {
+public:
+    static std::string read(std::filesystem::path filePath);
+    static void print(std::vector<std::string> fileData);
+private:
+};
+
+#endif

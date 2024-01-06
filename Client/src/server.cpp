@@ -4,11 +4,13 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <chrono>
 
 #include "../header/server.h"
 #include "../include/server.h"
 
 #define CHUNK_SIZE 1024
+#define TIMEOUT 5
 
 Server::Server(int port) : _port(port) 
 {
@@ -21,7 +23,7 @@ Server::Server(int port) : _port(port)
         return;
     }
     startserver(_port);
-    std::cout << "Listening on " << _port << "..." << std::endl;
+    std::cout << "Server started on port "<< _port << std::endl;
 }
 
 int Server::stop() 
@@ -41,10 +43,16 @@ int Server::stop()
 
 std::string Server::getRequest()
 {
+    auto start = std::chrono::high_resolution_clock::now();
     std::string request;
     std::string buffer;
     while ((buffer = getStringMsg()) != "###EOF###") {
         request.append(buffer); 
+        auto end = std::chrono::high_resolution_clock::now();
+        if(std::chrono::duration_cast<std::chrono::seconds>(end - start).count() > TIMEOUT){
+           std::cerr << "Response tiemout" << std::endl;
+            return "";
+        }
     }
     std::cout << "Received : " << request << "\n" << std::endl;
     return request;

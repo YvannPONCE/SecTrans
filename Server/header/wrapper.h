@@ -6,7 +6,8 @@
 class Wrapper {
 public:
     static std::string getType(std::string request);
-    static void unWrappInit(const std::string &request, std::string &hostname, int &port, std::string &clientPublicKey);
+    static std::string wrapPUBK(std::string pubKey);
+    static void unWrappInit(const std::string &request, int &port, std::string &clientPublicKey);
 private:
 };
 

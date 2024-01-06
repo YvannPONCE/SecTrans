@@ -9,7 +9,11 @@ std::string Wrapper::getType(std::string request){
     return request.substr(0, 4);
 }
 
-void Wrapper::unWrappInit(const std::string &request, std::string &hostname, int &port, std::string &clientPublicKey){
+std::string Wrapper::wrapPUBK(std::string pubKey){
+    return "PUBK#" + pubKey ;
+}
+
+void Wrapper::unWrappInit(const std::string &request, int &port, std::string &clientPublicKey){
     std::string subRequest = request.substr(5);
     std::istringstream ss(subRequest);
 
@@ -20,7 +24,6 @@ void Wrapper::unWrappInit(const std::string &request, std::string &hostname, int
         parts.push_back(part);
     }
 
-    hostname = parts[0];
-    std::istringstream(parts[1]) >> port;
-    clientPublicKey = parts[2];
+    std::istringstream(parts[0]) >> port;
+    clientPublicKey = parts[1];
 }

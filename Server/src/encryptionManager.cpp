@@ -2,6 +2,7 @@
 
 #include "./../header/encryptionManager.h"
 
+// CRE UNE NOUVELLE CLE RSA 2048
 EncryptionManager::EncryptionManager(){
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr); 
     if (!ctx || EVP_PKEY_keygen_init(ctx) <= 0 ||
@@ -25,41 +26,40 @@ EncryptionManager::~EncryptionManager(){
     ERR_free_strings();
 }
 
+// RECUPERE SA CLE PUBLIQUE POUR LA PARTAGER EN FORMAT PEM (--- PUB KEY --- 'àtçr'à"'jg'ijfoippjirvojS --- END PUB KEY ---)
 std::string EncryptionManager::getPublicKey(){
-    unsigned char* buffer = nullptr;
-    int length = i2d_PUBKEY(_keyPair, &buffer);
-    if (length <= 0 || buffer == nullptr) {
-        std::cerr << "Error converting public key to string" << std::endl;
-        exit(EXIT_FAILURE);
+    BIO* bio = BIO_new(BIO_s_mem());
+
+    if (!bio) {
+        throw std::runtime_error("Failed to create BIO");
     }
 
-    std::string public_key_str(reinterpret_cast<const char*>(buffer), length);
-    OPENSSL_free(buffer);
+    if (PEM_write_bio_PUBKEY(bio, _keyPair) != 1) {
+        throw std::runtime_error("Failed to print public key");
+    }
+    size_t bioLength = BIO_ctrl_pending(bio);
 
-    return public_key_str;
+    std::string publicKeyString(bioLength, '\0');
+    BIO_read(bio, publicKeyString.data(), bioLength);
+
+    return publicKeyString;
 }
 
-std::string EncryptionManager::getClientPublicKey(){
-    unsigned char* buffer = nullptr;
-    int length = i2d_PUBKEY(_clientKeyPair, &buffer);
-    if (length <= 0 || buffer == nullptr) {
-        std::cerr << "Error converting public key to string" << std::endl;
-        exit(EXIT_FAILURE);
+// ENREGISTRE LA CLE PUBLIQUE DE SON INTERLOCUTEUR
+void EncryptionManager::setClientPublicKey(std::string clientPublicKey){
+    BIO* bio = BIO_new_mem_buf(clientPublicKey.data(), clientPublicKey.size()), BIO_Deleter();
+
+    if (!bio) {
+        throw std::runtime_error("Failed to create BIO from public key string");
     }
 
-    std::string public_key_str(reinterpret_cast<const char*>(buffer), length);
-    OPENSSL_free(buffer);
+    // Read the public key from the BIO
+    _clientKeyPair =  PEM_read_bio_PUBKEY(bio, nullptr, nullptr, nullptr);
 
-    return public_key_str;
-}
-
-void EncryptionManager::setClientPublicKey(std::string serverPublicKey){
-    const unsigned char* data = reinterpret_cast<const unsigned char*>(serverPublicKey.c_str());
-    _clientKeyPair = d2i_PUBKEY(nullptr, &data, serverPublicKey.length());
     if (!_clientKeyPair) {
-        std::cerr << "Error recreating public key from string" << std::endl;
-        exit(EXIT_FAILURE);
+        throw std::runtime_error("Failed to create EVP_PKEY from public key string");
     }
+    std::cout << "Client public key saved" << std::endl;
 }
 
 

@@ -11,6 +11,9 @@ private:
    EVP_PKEY* _keyPair = nullptr;
    EVP_PKEY* _serverKeyPair = nullptr;
 
+   void unsignedCharToChar(unsigned char* encryptedData, char* charArray, int len);
+   void charToUnsignedChar(char* data, unsigned char* unsigneCharArray, int len);
+
 public:
     EncryptionManager();
     ~EncryptionManager();
@@ -18,8 +21,8 @@ public:
     std::string getPublicKey();
     std::string getServerPublicKey();
     void setServerPublicKey(std::string serverPublicKey);
-    std::string encrypt(const std::string &plaintext);
-    std::string decrypt(std::string data);
+    char* encrypt(const std::string &plaintext);
+    std::string decrypt(char* cypherText);
 };
 
 #endif

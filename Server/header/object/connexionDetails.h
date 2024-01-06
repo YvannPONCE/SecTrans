@@ -5,15 +5,13 @@
 
 class ConnexionDetails {
 private:
-    std::string _hostname;
     std::string _pubKey;
     int _port; 
 
 public:
     // Constructor
-    ConnexionDetails(std::string hostname, int port, std::string pubKey);
+    ConnexionDetails(int port, std::string pubKey);
 
-    std::string getHostname();
     std::string getPubKey(); 
     int getPort();
 };
