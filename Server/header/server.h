@@ -17,7 +17,7 @@ public:
     int stop();
 
     /* read message sent by client */
-    std::vector<std::string> getfile();
+    std::string getRequest();
 };
 
 #endif

@@ -27,9 +27,12 @@ int Client::sendmsg(std::string message)
         std::cerr << "The message is too big" << std::endl;
         return EXIT_FAILURE;
     }
-    
+    std::cout << "Message received : " << std::endl;
+    std::cout << message << std::endl;
+    std::cout << std::strlen(message.c_str()) << std::endl;
     sndmsg(message.c_str(), _port);
-    std::cout << "Message sent" << std::endl;
+    sndmsg("###EOF###", _port);
+    //std::cout << "Sent : " << std::endl << message << "\n" << std::endl;
     return EXIT_SUCCESS;
 }
 

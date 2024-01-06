@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 #include <string>
 #include <vector>
+#include <cstring>
 
 #include "../header/server.h"
 #include "../include/server.h"
@@ -38,15 +39,16 @@ int Server::stop()
     return EXIT_SUCCESS;
 }
 
-std::vector<std::string> Server::getfile()
+std::string Server::getRequest()
 {
-    std::vector<std::string> fileData;
+    std::string request;
     std::string buffer;
     while ((buffer = getStringMsg()) != "###EOF###") {
-        fileData.push_back(buffer);
+        std::cout << "Buffer : "<< std::endl << buffer << std::endl;
+        request.append(buffer); 
     }
-
-    return fileData;
+    std::cout << "Request : " << request << "\n" << std::endl;
+    return request;
 }
 
 /* read message sent by client */
@@ -62,6 +64,10 @@ std::string Server::getStringMsg()
         return "";
     }
     getmsg(message);
+    std::cout << "Message received : \n\n\n" << std::endl;
+    std::cout << message << std::endl;
+    std::string msgStr(message);
+    std::cout << std::strlen(msgStr.c_str()) << std::endl;
     return  std::string(message);  
 }
 
