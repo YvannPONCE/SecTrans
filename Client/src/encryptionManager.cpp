@@ -26,39 +26,53 @@ EncryptionManager::~EncryptionManager(){
 }
 
 std::string EncryptionManager::getPublicKey(){
-    unsigned char* buffer = nullptr;
-    int length = i2d_PUBKEY(_keyPair, &buffer);
-    if (length <= 0 || buffer == nullptr) {
-        std::cerr << "Error converting public key to string" << std::endl;
-        exit(EXIT_FAILURE);
+    BIO* bio = BIO_new(BIO_s_mem());
+
+    if (!bio) {
+        throw std::runtime_error("Failed to create BIO");
     }
 
-    std::string public_key_str(reinterpret_cast<const char*>(buffer), length);
-    OPENSSL_free(buffer);
+    if (PEM_write_bio_PUBKEY(bio, _keyPair) != 1) {
+        throw std::runtime_error("Failed to print public key");
+    }
+    size_t bioLength = BIO_ctrl_pending(bio);
 
-    return public_key_str;
+    std::string publicKeyString(bioLength, '\0');
+    BIO_read(bio, publicKeyString.data(), bioLength);
+
+    return publicKeyString;
 }
 
 std::string EncryptionManager::getServerPublicKey(){
-    unsigned char* buffer = nullptr;
-    int length = i2d_PUBKEY(_serverKeyPair, &buffer);
-    if (length <= 0 || buffer == nullptr) {
-        std::cerr << "Error converting public key to string" << std::endl;
-        exit(EXIT_FAILURE);
+    BIO* bio = BIO_new(BIO_s_mem());
+
+    if (!bio) {
+        throw std::runtime_error("Failed to create BIO");
     }
 
-    std::string public_key_str(reinterpret_cast<const char*>(buffer), length);
-    OPENSSL_free(buffer);
+    if (EVP_PKEY_print_public(bio, _serverKeyPair, 0, nullptr) != 1) {
+        throw std::runtime_error("Failed to print public key");
+    }
+    size_t bioLength = BIO_ctrl_pending(bio);
 
-    return public_key_str;
+    std::string publicKeyString(bioLength, '\0');
+    BIO_read_ex(bio, publicKeyString.data(), bioLength, &bioLength);
+
+    return publicKeyString;
 }
 
 void EncryptionManager::setServerPublicKey(std::string serverPublicKey){
-    const unsigned char* data = reinterpret_cast<const unsigned char*>(serverPublicKey.c_str());
-    _serverKeyPair = d2i_PUBKEY(nullptr, &data, serverPublicKey.length());
+    BIO* bio = BIO_new_mem_buf(serverPublicKey.data(), serverPublicKey.size()), BIO_Deleter();
+
+    if (!bio) {
+        throw std::runtime_error("Failed to create BIO from public key string");
+    }
+
+    // Read the public key from the BIO
+    _serverKeyPair =  PEM_read_bio_PUBKEY(bio, nullptr, nullptr, nullptr);
+
     if (!_serverKeyPair) {
-        std::cerr << "Error recreating public key from string" << std::endl;
-        exit(EXIT_FAILURE);
+        throw std::runtime_error("Failed to create EVP_PKEY from public key string");
     }
 }
 

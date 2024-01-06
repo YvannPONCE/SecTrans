@@ -14,6 +14,9 @@ int main() {
     EncryptionManager encryptionManager;
 
     std::string pub_key = encryptionManager.getPublicKey();
+    std::cout << "---------------------" << std::endl;
+    std::cout << pub_key << std::endl;
+    std::cout << "---------------------" << std::endl;
     encryptionManager.setServerPublicKey(pub_key);
 
     std::string server_pub_key = encryptionManager.getServerPublicKey();
@@ -33,6 +36,6 @@ int main() {
 
     std::string request = Wrapper::wrap(hostname, port, pub_key);
 
-    client.sendmsg(request);
+    client.sendmsg(pub_key);
     return 0;
 }
