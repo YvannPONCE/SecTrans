@@ -8,7 +8,7 @@ private:
     int _port;
     void* _serverHandler;
 
-    std::string getStringMsg();
+    std::string getMsg(); 
     void loadLibrary(std::string libraryPath);
 
 public:

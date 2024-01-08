@@ -8,13 +8,13 @@ std::string Wrapper::getType(std::string request){
 }
 
 std::string Wrapper::wrapINIT(int port, std::string pubKey){
-    return "INIT#" + std::to_string(port) + "#" + pubKey;
+    return std::to_string(port) + "#" + pubKey;
 }
 
-std::string Wrapper::wrapFILE(std::string data){
-    return "FILE#" + data;
+std::string Wrapper::wrapFILE(char* data){
+    
+    return  "";
 }
-
 
 
 std::string Wrapper::unwrappPUBK(std::string request){

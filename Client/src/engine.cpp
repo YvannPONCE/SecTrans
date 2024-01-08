@@ -1,18 +1,21 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstring>
 
 #include "../header/engine.h"
 #include "../header/wrapper.h"
 #include "../header/encryptionManager.h"
 #include "../header/client.h"
 
+#define MAX_SIZE 256
+
 Engine::Engine(): _encryptionManager(), _client(5001), _server(5002) {}
 
-void Engine::sendRequest(const std::string &type, const std::string &data){
+void Engine::sendRequest(std::string type, std::string data){
     if(type == "INIT"){
         std::string request = Wrapper::wrapINIT(5002, _encryptionManager.getPublicKey());
-        _client.sendmsg(request);
+        _client.sendmsg("INIT#" , request.c_str());
         std::string response = waitForResponse();
         processRequest(response);
     }
@@ -20,13 +23,11 @@ void Engine::sendRequest(const std::string &type, const std::string &data){
     {
         std::string path = data;
         std::string file_data = FileManager::read(std::filesystem::path(path));
-        std::string cypher_file_data = _encryptionManager.encrypt(file_data);
-        std::cout << "------------" << std::endl;
-        std::cout << cypher_file_data << std::endl;
-        std::cout << "------------" << std::endl;
-        std::string request = Wrapper::wrapFILE(cypher_file_data);
-        _client.sendmsg(request);
 
+        std::string cypher = _encryptionManager.encrypt(file_data);
+        //std::string plain = _encryptionManager.decrypt(cypher);
+        //std::cout << "Plain : " << plain << std::endl;
+         _client.sendmsg("FILE#", cypher);
     }
     else
     {

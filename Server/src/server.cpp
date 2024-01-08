@@ -43,18 +43,18 @@ std::string Server::getRequest()
 {
     std::string request;
     std::string buffer;
-    while ((buffer = getStringMsg()) != "###EOF###") {
-        request.append(buffer); 
+
+    while ((buffer = getMsg()) != "###EOF###") {
+        request += buffer;
     }
-    std::cout << "Received : " << request << "\n" << std::endl;
+    std::cout << "Received : \n" << request << "\n"<< std::endl;
     return request;
 }
 
 /* read message sent by client */
-std::string Server::getStringMsg() 
+std::string Server::getMsg() 
 {
-    char message[CHUNK_SIZE];
-
+    char buffer[1024]= {0};
     typedef int (*getmsgFunction)(const char msg[CHUNK_SIZE]);
     getmsgFunction getmsg = reinterpret_cast<getmsgFunction>(dlsym(_serverHandler, "getmsg"));
     if (!getmsg) {
@@ -62,8 +62,8 @@ std::string Server::getStringMsg()
         dlclose(_serverHandler);
         return "";
     }
-    getmsg(message);
-    return  std::string(message);  
+    getmsg(buffer);
+    return std::string(buffer); 
 }
 
 void Server::loadLibrary(std::string libraryPath)

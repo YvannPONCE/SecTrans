@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <unistd.h>
+#include <cstring>
 
 #include "./../header/encryptionManager.h"
 
@@ -77,16 +79,14 @@ void EncryptionManager::setServerPublicKey(std::string serverPublicKey){
     if (!_serverKeyPair) {
         throw std::runtime_error("Failed to create EVP_PKEY from public key string");
     }
-
-    //std::cout << "Server public key saved" << std::endl;
 }
 
 
-char* EncryptionManager::encrypt(const std::string& plaintext){
-    setServerPublicKey(getPublicKey());
+std::string EncryptionManager::encrypt(const std::string &plaintext){
+    
     unsigned char encryptedData[EVP_PKEY_size(_serverKeyPair)];
     EVP_PKEY_CTX *ctx;
-    if(!(ctx = EVP_PKEY_CTX_new(_keyPair, nullptr))) {
+    if(!(ctx = EVP_PKEY_CTX_new(_serverKeyPair, nullptr))) {
         std::cerr << "Error creating context" << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -96,26 +96,15 @@ char* EncryptionManager::encrypt(const std::string& plaintext){
     size_t outlen;
     if (EVP_PKEY_encrypt(ctx, encryptedData, &outlen, reinterpret_cast<const unsigned char*>(plaintext.c_str()), plaintext.length()) != 1) {
         throw std::runtime_error("Encryption failed");
-    }
-
-    std::cout << std::endl;
-    for(int i=0; i< EVP_PKEY_size(_serverKeyPair); ++i){
-        std::cout << static_cast<int>(encryptedData[i]) << " "; 
-    }
-    std::cout << std::endl;
-    
-
-    char charArray[EVP_PKEY_size(_serverKeyPair)];
-    unsignedCharToChar(encryptedData, charArray, EVP_PKEY_size(_serverKeyPair));
-    decrypt(charArray);
-    return nullptr;
+    } 
+    return unsignedCharToString(encryptedData, EVP_PKEY_size(_serverKeyPair));
 }
 
-std::string EncryptionManager::decrypt(char* cypherText){
+std::string EncryptionManager::decrypt(std::string cypherText){
     unsigned char cypherTextUnsignedChar[EVP_PKEY_size(_keyPair)];
     charToUnsignedChar(cypherText, cypherTextUnsignedChar, EVP_PKEY_size(_keyPair));
 
-    std::vector<unsigned char> decryptedData(EVP_PKEY_size(_keyPair));
+    unsigned char decryptedData[EVP_PKEY_size(_keyPair)];
     EVP_PKEY_CTX *ctx;
     if(!(ctx = EVP_PKEY_CTX_new(_keyPair, nullptr))) {
         std::cerr << "Error creating context" << std::endl;
@@ -126,34 +115,66 @@ std::string EncryptionManager::decrypt(char* cypherText){
     }
     size_t outlen;
 
-    if (EVP_PKEY_decrypt(ctx, decryptedData.data(), &outlen, cypherTextUnsignedChar, EVP_PKEY_size(_keyPair)) <= 0){
+    if (EVP_PKEY_decrypt(ctx, decryptedData, &outlen, cypherTextUnsignedChar, EVP_PKEY_size(_keyPair)) <= 0){
         std::cerr << "Error decrypting" << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    std::cout << std::endl;
-    for(int i=0; i< EVP_PKEY_size(_serverKeyPair); ++i){
-        std::cout << static_cast<int>(decryptedData[i]) << " "; 
-    }
-    std::cout << std::endl;
-
-    std::string decryptedStr(decryptedData.begin(), decryptedData.end());
-    std::cout << decryptedStr << std::endl;
-
-
+    std::string decryptedStr = unsignedCharToReadableString(decryptedData, EVP_PKEY_size(_keyPair));
     return decryptedStr;
 }
 
 
 
-void EncryptionManager::unsignedCharToChar(unsigned char* encryptedData, char* charArray, int len){
-    for (int i = 0; i < len; ++i) {
-        charArray[i] = static_cast<char>(encryptedData[i] - 127);
+std::string EncryptionManager::unsignedCharToString(unsigned char* encryptedData, int len){
+
+    std::cout << "Cypher : \n" << std::endl;
+    for (size_t i = 0; i < 256; i++)
+    {
+        std::cout << int(encryptedData[i]) << " ";
     }
+    std::cout << "\n" << std::endl;
+
+    BIO *bio, *b64;
+    BUF_MEM *bufferPtr;
+
+    b64 = BIO_new(BIO_f_base64());
+    bio = BIO_new(BIO_s_mem());
+    bio = BIO_push(b64, bio);
+
+    BIO_write(bio, encryptedData, len);
+    BIO_flush(bio);
+
+    BIO_get_mem_ptr(bio, &bufferPtr);
+    char base64Ciphertext[1024];
+    memcpy(base64Ciphertext, bufferPtr->data, bufferPtr->length - 1);
+    (base64Ciphertext)[bufferPtr->length - 1] = '\0'; // Null-terminate the string
+
+    // Clean up
+    BIO_free_all(bio);
+    return std::string(base64Ciphertext);
+
+    //for (int i = 0; i < len; ++i) {
+    //    charArray[i] = static_cast<char>(encryptedData[i] - 127);
+    //}
 }
 
-void EncryptionManager::charToUnsignedChar(char* data,unsigned char* unsignedCharArray, int len){
-    for (int i = 0; i < len; ++i) {
-        unsignedCharArray[i] = static_cast<unsigned char>(data[i] + 127);
+std::string EncryptionManager::unsignedCharToReadableString(unsigned char* decryptedData, int len){
+    return std::string(reinterpret_cast<char*>(decryptedData), len);
+}
+
+void EncryptionManager::charToUnsignedChar(std::string base64Ciphertext,unsigned char* decodedCiphertext, int len){
+    BIO *bio, *b64;
+
+    b64 = BIO_new(BIO_f_base64());
+    bio = BIO_new_mem_buf(base64Ciphertext.c_str(), -1); // -1 means null-terminated string
+    bio = BIO_push(b64, bio);
+
+    int decodedLength = BIO_read(bio, decodedCiphertext, base64Ciphertext.size());
+    if (decodedLength <= 0) {
+        BIO_free_all(bio);
+        std::cout << "Error decoding Base64" << std::endl;
     }
+
+    BIO_free_all(bio);
 }

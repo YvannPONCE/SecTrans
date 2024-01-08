@@ -29,7 +29,6 @@ int Client::sendmsg(int port, std::string message)
     }
     sndmsg(message.c_str(), port);
     sndmsg("###EOF###", port);
-    std::cout << "Sent : " << std::endl << message << "\n" << std::endl;
     return EXIT_SUCCESS;
 }
 

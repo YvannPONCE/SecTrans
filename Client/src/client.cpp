@@ -14,7 +14,7 @@ Client::Client(int port) : _port(port) {
 }
 
 /* send message (maximum size: 1024 bytes) */
-int Client::sendmsg(std::string message)
+int Client::sendmsg(std::string type ,const std::string message)
 {
     typedef int (*sndmsgFunction)(const char msg[1024], int port);
     sndmsgFunction sndmsg = reinterpret_cast<sndmsgFunction>(dlsym(_clientHandler, "sndmsg"));
@@ -22,14 +22,14 @@ int Client::sendmsg(std::string message)
         std::cerr << "Error getting symbol: " << dlerror() << std::endl;
         dlclose(_clientHandler);
         return EXIT_FAILURE;
-    } else if(std::strlen(message.c_str()) > 1024)
+    } else if(message.size() > 1024)
     {
         std::cerr << "The message is too big" << std::endl;
         return EXIT_FAILURE;
     }
+    sndmsg(type.c_str(), _port);
     sndmsg(message.c_str(), _port);
     sndmsg("###EOF###", _port);
-    std::cout << "Sent : " << std::endl << message << "\n" << std::endl;
     return EXIT_SUCCESS;
 }
 

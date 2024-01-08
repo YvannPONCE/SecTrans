@@ -23,7 +23,7 @@ Server::Server(int port) : _port(port)
         return;
     }
     startserver(_port);
-    std::cout << "Server started on port "<< _port << std::endl;
+    std::cout << "Server started on port "<< _port << "...\n" << std::endl;
 }
 
 int Server::stop() 

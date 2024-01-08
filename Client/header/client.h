@@ -15,7 +15,7 @@ public:
     Client(int port);
 
     /* send message (maximum size: 1024 bytes) */
-    int sendmsg(std::string message); 
+    int sendmsg(std::string type ,const std::string message);
 };
 
 #endif

@@ -14,8 +14,7 @@ std::string Wrapper::wrapPUBK(std::string pubKey){
 }
 
 void Wrapper::unWrappInit(const std::string &request, int &port, std::string &clientPublicKey){
-    std::string subRequest = request.substr(5);
-    std::istringstream ss(subRequest);
+    std::istringstream ss(request);
 
     std::vector<std::string> parts;
     std::string part;
