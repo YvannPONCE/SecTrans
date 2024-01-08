@@ -11,7 +11,7 @@
 
 // Constructor
 Client::Client(int port) : _port(port) {
-    loadLibrary("lib/libclient.so");
+    loadLibrary("../lib/libclient.so");
 }
 
 /* send message (maximum size: 1024 bytes) */

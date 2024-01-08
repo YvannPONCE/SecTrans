@@ -206,7 +206,6 @@ void EncryptionManager::generateNewKey(){
     OpenSSL_add_all_algorithms();
 
     // Create an RSA key
-    _keyPair = EVP_PKEY_new();
     EVP_PKEY_CTX* context = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr);
 
     if (EVP_PKEY_keygen_init(context) <= 0 || EVP_PKEY_keygen(context, &_keyPair) <= 0) {
@@ -228,7 +227,6 @@ void EncryptionManager::generateNewKey(){
 
     // Cleanup
     fclose(file);
-    EVP_PKEY_free(_keyPair);
     EVP_PKEY_CTX_free(context);
 
     // Cleanup OpenSSL

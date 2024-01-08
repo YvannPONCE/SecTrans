@@ -12,7 +12,7 @@
 
 Server::Server(int port) : _port(port) 
 {
-    loadLibrary("lib/libserver.so");
+    loadLibrary("../lib/libserver.so");
     typedef int (*startserverFunction)(int);
     startserverFunction startserver = reinterpret_cast<startserverFunction>(dlsym(_serverHandler, "startserver"));
     if (!startserver) {
