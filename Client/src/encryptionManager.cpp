@@ -1,25 +1,14 @@
 #include <algorithm>
 #include <unistd.h>
 #include <cstring>
+#include <filesystem>
 
 #include "./../header/encryptionManager.h"
 
+#define KEY_PATH "./privateKey.pem"
+
 // CRE UNE NOUVELLE CLE RSA 2048
-EncryptionManager::EncryptionManager(){
-    EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr); 
-    if (!ctx || EVP_PKEY_keygen_init(ctx) <= 0 ||
-        EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, 2048) <= 0) {
-        std::cerr << "Error initializing RSA key generation context" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    if (EVP_PKEY_keygen(ctx, &_keyPair) <= 0) {
-        std::cerr << "Error generating RSA key pair" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    EVP_PKEY_CTX_free(ctx);
-}
+EncryptionManager::EncryptionManager(){}
 
 EncryptionManager::~EncryptionManager(){
     // Clean up
@@ -100,7 +89,25 @@ std::string EncryptionManager::encrypt(const std::string &plaintext){
     return unsignedCharToString(encryptedData, EVP_PKEY_size(_serverKeyPair));
 }
 
-std::string EncryptionManager::decrypt(std::string cypherText){
+std::string EncryptionManager::ownEncrypt(const std::string &plaintext){
+
+    unsigned char encryptedData[EVP_PKEY_size(_keyPair)];
+    EVP_PKEY_CTX *ctx;
+    if(!(ctx = EVP_PKEY_CTX_new(_keyPair, nullptr))) {
+        std::cerr << "Error creating context" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    if (EVP_PKEY_encrypt_init(ctx) != 1) {
+        throw std::runtime_error("Failed to initialize encryption");
+    }
+    size_t outlen;
+    if (EVP_PKEY_encrypt(ctx, encryptedData, &outlen, reinterpret_cast<const unsigned char*>(plaintext.c_str()), plaintext.length()) != 1) {
+        throw std::runtime_error("Encryption failed");
+    } 
+    return unsignedCharToString(encryptedData, EVP_PKEY_size(_keyPair));
+}
+
+std::string EncryptionManager::decrypt(const std::string cypherText){
     unsigned char cypherTextUnsignedChar[EVP_PKEY_size(_keyPair)];
     charToUnsignedChar(cypherText, cypherTextUnsignedChar, EVP_PKEY_size(_keyPair));
 
@@ -152,7 +159,7 @@ std::string EncryptionManager::unsignedCharToString(unsigned char* encryptedData
 }
 
 std::string EncryptionManager::unsignedCharToReadableString(unsigned char* decryptedData, int len){
-    return std::string(reinterpret_cast<char*>(decryptedData), len);
+    return std::string(reinterpret_cast<char*>(decryptedData));
 }
 
 void EncryptionManager::charToUnsignedChar(std::string base64Ciphertext,unsigned char* decodedCiphertext, int len){
@@ -167,6 +174,65 @@ void EncryptionManager::charToUnsignedChar(std::string base64Ciphertext,unsigned
         BIO_free_all(bio);
         std::cout << "Error decoding Base64" << std::endl;
     }
-
+    // Clean up
     BIO_free_all(bio);
 }
+
+
+void EncryptionManager::loadKeyFile(){
+    if (!std::filesystem::exists(KEY_PATH)){
+        generateNewKey();
+        return;
+    }
+
+    FILE* file = fopen(KEY_PATH, "rb");
+
+    if (!file) {
+        std::cerr << "Error opening file for reading." << std::endl;
+        return;
+    }
+
+    _keyPair = PEM_read_PrivateKey(file, nullptr, nullptr, nullptr);
+
+    fclose(file);
+
+    if (!_keyPair) {
+        std::cerr << "Error loading private key from file." << std::endl;
+    }
+}
+
+void EncryptionManager::generateNewKey(){
+    // Initialize OpenSSL
+    OpenSSL_add_all_algorithms();
+
+    // Create an RSA key
+    _keyPair = EVP_PKEY_new();
+    EVP_PKEY_CTX* context = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr);
+
+    if (EVP_PKEY_keygen_init(context) <= 0 || EVP_PKEY_keygen(context, &_keyPair) <= 0) {
+        std::cerr << "Error generating RSA key." << std::endl;
+        return;
+    }
+
+    // Save the private key to a PEM file
+    FILE* file = fopen(KEY_PATH, "wb");
+
+    if (!file) {
+        std::cerr << "Error opening file for writing." << std::endl;
+        return;
+    }
+
+    if (PEM_write_PrivateKey(file, _keyPair, nullptr, nullptr, 0, nullptr, nullptr) <= 0) {
+        std::cerr << "Error writing private key to file." << std::endl;
+    }
+
+    // Cleanup
+    fclose(file);
+    EVP_PKEY_free(_keyPair);
+    EVP_PKEY_CTX_free(context);
+
+    // Cleanup OpenSSL
+    EVP_cleanup();
+    CRYPTO_cleanup_all_ex_data();
+}
+

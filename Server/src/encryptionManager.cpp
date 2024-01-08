@@ -79,8 +79,6 @@ void EncryptionManager::setClientPublicKey(std::string clientPublicKey){
     if (!_clientKeyPair) {
         throw std::runtime_error("Failed to create EVP_PKEY from public key string");
     }
-
-    //std::cout << "Client public key saved" << std::endl;
 }
 
 
@@ -103,7 +101,7 @@ std::string EncryptionManager::encrypt(const std::string &plaintext){
     return unsignedCharToString(encryptedData, EVP_PKEY_size(_clientKeyPair));
 }
 
-std::string EncryptionManager::decrypt(std::string cypherText){
+std::string EncryptionManager::decrypt(const std::string cypherText){
     unsigned char cypherTextUnsignedChar[EVP_PKEY_size(_keyPair)];
     charToUnsignedChar(cypherText, cypherTextUnsignedChar, EVP_PKEY_size(_keyPair));
 
@@ -148,11 +146,7 @@ std::string EncryptionManager::unsignedCharToString(unsigned char* encryptedData
 
     // Clean up
     BIO_free_all(bio);
-    return std::string(base64Ciphertext);
-
-    //for (int i = 0; i < len; ++i) {
-    //    charArray[i] = static_cast<char>(encryptedData[i] - 127);
-    //}
+    return std::string(base64Ciphertext);   
 }
 
 std::string EncryptionManager::unsignedCharToReadableString(unsigned char* decryptedData, int len){
@@ -171,12 +165,6 @@ void EncryptionManager::charToUnsignedChar(std::string base64Ciphertext,unsigned
         BIO_free_all(bio);
         std::cout << "Error decoding Base64" << std::endl;
     }
-
     // Clean up
     BIO_free_all(bio);
-    
-
-    //for (int i = 0; i < len; ++i) {
-    //    unsignedCharArray[i] = static_cast<unsigned char>(data[i] + 127);
-    //}
 }

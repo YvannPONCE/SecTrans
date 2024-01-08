@@ -23,7 +23,10 @@ public:
     std::string getServerPublicKey();
     void setServerPublicKey(std::string serverPublicKey);
     std::string encrypt(const std::string &plaintext);
+    std::string ownEncrypt(const std::string &plaintext);
     std::string decrypt(const std::string cypherText);
+    void generateNewKey();
+    void loadKeyFile();
 };
 
 #endif

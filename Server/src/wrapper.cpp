@@ -9,11 +9,16 @@ std::string Wrapper::getType(std::string request){
     return request.substr(0, 4);
 }
 
-std::string Wrapper::wrapPUBK(std::string pubKey){
-    return "PUBK#" + pubKey ;
+std::string Wrapper::wrapLIST(std::vector<std::string> fileNames){
+    std::string request;
+    for (std::string fileName : fileNames) {
+        fileName = fileName+ static_cast<std::string>("#");
+        request = request + fileName;
+    }
+    return request;
 }
 
-void Wrapper::unWrappInit(const std::string &request, int &port, std::string &clientPublicKey){
+std::vector<std::string> Wrapper::unWrappRequest(const std::string &request){
     std::istringstream ss(request);
 
     std::vector<std::string> parts;
@@ -23,6 +28,6 @@ void Wrapper::unWrappInit(const std::string &request, int &port, std::string &cl
         parts.push_back(part);
     }
 
-    std::istringstream(parts[0]) >> port;
-    clientPublicKey = parts[1];
+    return parts;
 }
+

@@ -3,18 +3,19 @@
 #include <cstring>
 #include <dlfcn.h>
 #include <string>
+#include <vector>
 
 #include "./../header/client.h"
 
 #define CHUNK_SIZE 1024
 
 // Constructor
-Client::Client() {
+Client::Client(int port) : _port(port) {
     loadLibrary("lib/libclient.so");
 }
 
 /* send message (maximum size: 1024 bytes) */
-int Client::sendmsg(int port, std::string message)
+int Client::sendmsg(std::string type ,const std::string message)
 {
     typedef int (*sndmsgFunction)(const char msg[1024], int port);
     sndmsgFunction sndmsg = reinterpret_cast<sndmsgFunction>(dlsym(_clientHandler, "sndmsg"));
@@ -22,13 +23,20 @@ int Client::sendmsg(int port, std::string message)
         std::cerr << "Error getting symbol: " << dlerror() << std::endl;
         dlclose(_clientHandler);
         return EXIT_FAILURE;
-    } else if(std::strlen(message.c_str()) > 1024)
-    {
-        std::cerr << "The message is too big" << std::endl;
-        return EXIT_FAILURE;
+    } 
+
+    // SPLIT in PART OF 1024
+    std::vector<std::string> chunks;
+    for (size_t i = 0; i < message.length(); i += CHUNK_SIZE) {
+        chunks.push_back(message.substr(i, CHUNK_SIZE));
     }
-    sndmsg(message.c_str(), port);
-    sndmsg("###EOF###", port);
+
+
+    sndmsg(type.c_str(), _port);
+    for (const auto& chunk : chunks) {
+        sndmsg(chunk.c_str(), _port);
+    }
+    sndmsg("###EOF###", _port);
     return EXIT_SUCCESS;
 }
 

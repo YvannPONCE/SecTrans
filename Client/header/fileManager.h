@@ -7,8 +7,10 @@
 
 class FileManager {
 public:
+    static void InitFileSystem();
     static std::string read(std::filesystem::path filePath);
     static void print(std::vector<std::string> fileData);
+    static void registerFile(std::string fileName, std::string  data);
 private:
 };
 

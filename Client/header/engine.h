@@ -18,7 +18,9 @@ private:
 public:
     Engine();
     
-    void sendRequest( std::string type, std::string data);
+    void sendRequest( std::string type);
+    void sendRequest(std::string type, std::string username, std::string password, std::string path);
+    void sendRequest(std::string type, std::string username, std::string password);
     void processRequest(std::string request);
     std::string waitForResponse();
 };

@@ -5,15 +5,17 @@
 
 class Client {
 private:
+    int _port;
     void* _clientHandler;
+
     void loadLibrary(std::string libraryPath);
 
 public:
     // Constructor
-    Client();
+    Client(int port);
 
     /* send message (maximum size: 1024 bytes) */
-    int sendmsg(int port, std::string message); 
+    int sendmsg(std::string type ,const std::string message);
 };
 
 #endif

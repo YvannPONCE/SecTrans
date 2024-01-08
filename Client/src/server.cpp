@@ -23,7 +23,7 @@ Server::Server(int port) : _port(port)
         return;
     }
     startserver(_port);
-    std::cout << "Server started on port "<< _port << "...\n" << std::endl;
+    std::cout << "Server started on port "<< _port << "..."<< std::endl;
 }
 
 int Server::stop() 
@@ -54,7 +54,7 @@ std::string Server::getRequest()
             return "";
         }
     }
-    std::cout << "Received : " << request << "\n" << std::endl;
+    //std::cout << "Received : " << request << "\n" << std::endl;
     return request;
 }
 
