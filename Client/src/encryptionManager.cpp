@@ -54,7 +54,7 @@ void EncryptionManager::setServerPublicKey(std::string serverPublicKey){
 
 
 std::string EncryptionManager::encrypt(const std::string &plaintext){
-
+    std::cout <<" "<< std::endl;
     unsigned char encryptedData[EVP_PKEY_size(_serverKeyPair)];
     EVP_PKEY_CTX *ctx;
     if(!(ctx = EVP_PKEY_CTX_new(_serverKeyPair, nullptr))) {
@@ -72,7 +72,7 @@ std::string EncryptionManager::encrypt(const std::string &plaintext){
 }
 
 std::string EncryptionManager::ownEncrypt(const std::string &plaintext){
-
+    std::cout <<" "<< std::endl;
     unsigned char encryptedData[EVP_PKEY_size(_keyPair)];
     EVP_PKEY_CTX *ctx;
     if(!(ctx = EVP_PKEY_CTX_new(_keyPair, nullptr))) {
