@@ -34,13 +34,6 @@ std::string FileManager::readFile(std::string username , std::string fileName) {
     return fileContent;
 }
 
-
-std::vector<std::string> FileManager::wrap(std::vector<std::string> fileData)
-{
-    fileData.push_back("###EOF###");
-    return fileData;
-}
-
 void FileManager::createFolder(std::string username){
     std::string path = static_cast<std::string>(FOLDER_PATH) + static_cast<std::string>("/") + username;
      if (!std::filesystem::exists(path.c_str())){

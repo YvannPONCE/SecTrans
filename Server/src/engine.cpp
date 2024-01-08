@@ -9,7 +9,7 @@
 #include "../header/encryptionManager.h"
 #include "../header/client.h"
 
-Engine::Engine(): _connexions(), _encryptionManager(), _client(5002), _authentification(), _fileManager() {}
+Engine::Engine(): _encryptionManager(), _client(5002), _authentification(), _fileManager() {}
 
 void Engine::processRequest(std::string request){
     std::string type = request.substr(0,4);

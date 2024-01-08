@@ -1,5 +1,4 @@
 // engine.h
-#include "object/connexionDetails.h"
 #include "./encryptionManager.h"
 #include "./client.h"
 #include "./authentification.h"
@@ -10,7 +9,6 @@
 
 class Engine {
 private:
-    std::vector<ConnexionDetails> _connexions;
     EncryptionManager  _encryptionManager;
     Client _client;
     Authentification _authentification;

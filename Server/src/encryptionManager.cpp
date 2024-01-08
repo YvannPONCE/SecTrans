@@ -50,23 +50,7 @@ std::string EncryptionManager::getPublicKey(){
     return publicKeyString;
 }
 
-std::string EncryptionManager::getClientPublicKey(){
-    BIO* bio = BIO_new(BIO_s_mem());
 
-    if (!bio) {
-        throw std::runtime_error("Failed to create BIO");
-    }
-
-    if (PEM_write_bio_PUBKEY(bio, _clientKeyPair) != 1) {
-        throw std::runtime_error("Failed to print public key");
-    }
-    size_t bioLength = BIO_ctrl_pending(bio);
-
-    std::string publicKeyString(bioLength, '\0');
-    BIO_read(bio, publicKeyString.data(), bioLength);
-
-    return publicKeyString;
-}
 
 // ENREGISTRE LA CLE PUBLIQUE DE SON INTERLOCUTEUR
 void EncryptionManager::setClientPublicKey(std::string clientPublicKey){
