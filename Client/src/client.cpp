@@ -10,7 +10,7 @@
 #define CHUNK_SIZE 1024
 
 // Constructor
-Client::Client(int &port) : _port(port) {
+Client::Client(int port) : _port(port) {
     loadLibrary("../lib/libclient.so");
 }
 

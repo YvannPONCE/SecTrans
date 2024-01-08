@@ -3,7 +3,7 @@
 CC = g++
 CFLAGS = -Wall -std=c++17
 BUILDDIR = ./build
-TARGET = client.exe
+TARGET = SecTrans
 LIBDIR = ./lib
 
 ${TARGET}: src/main.cpp src/client.cpp src/fileManager.cpp src/wrapper.cpp src/encryptionManager.cpp src/server.cpp src/engine.cpp
