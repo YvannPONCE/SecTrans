@@ -29,9 +29,13 @@ void Engine::sendRequest(std::string type, std::string username, std::string pas
     {  
         std::string file_data = FileManager::read(std::filesystem::path(path));
 
+        std::cout <<""<< std::endl;
         std::string cypherFileData = _encryptionManager.ownEncrypt(file_data);
+        std::cout <<""<< std::endl;
         std::string cypherFileName = _encryptionManager.encrypt(std::filesystem::path(path).filename());
+        std::cout <<""<< std::endl;
         std::string cypherUsername = _encryptionManager.encrypt(username);
+        std::cout <<""<< std::endl;
         std::string cypherPassword = _encryptionManager.encrypt(password);
 
         std::string request = Wrapper::wrapFILE(cypherUsername, cypherPassword, cypherFileName, cypherFileData);
