@@ -83,6 +83,14 @@ void Engine::processRequest(std::string request){
         std::cout <<""<< std::endl;
         std::string plainFileData = _encryptionManager.decrypt(requestParameters[1]);
 
+        std::string sha256DataFile = requestParameters[2];
+        std::string computeSha256 = EncryptionManager::sha256(requestParameters[1]);
+
+        if(sha256DataFile != computeSha256){
+            std::cout << "File has been corrupt during transfert" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
         FileManager::registerFile(plainFileName, plainFileData);        
     }
     else if (type == "LIST")
@@ -97,6 +105,11 @@ void Engine::processRequest(std::string request){
     else if (type == "DEND")
     {
         std::cout << "Wrong credentials" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    else if (type == "CORR")
+    {
+        std::cout << "File has been corrupt during transfert" << std::endl;
         exit(EXIT_FAILURE);
     }
     else if (type == "SUCC")

@@ -27,6 +27,7 @@ public:
     std::string decrypt(const std::string cypherText);
     void generateNewKey();
     void loadKeyFile();
+    static std::string sha256(const std::string& input);
 };
 
 #endif

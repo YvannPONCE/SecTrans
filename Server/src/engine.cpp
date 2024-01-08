@@ -33,6 +33,13 @@ void Engine::processRequest(std::string request){
         std::string plainPassword = _encryptionManager.decrypt(requestParameters[1]);
         std::cout << std::endl;
         std::string plainFileName = _encryptionManager.decrypt(requestParameters[2]);
+        std::cout << std::endl;
+        std::string sha256DataFile = requestParameters[4];
+        std::string computeSha256 = EncryptionManager::sha256(requestParameters[3]);
+
+        if(sha256DataFile != computeSha256){
+            _client.sendmsg("CORR#","");
+        }
 
         std::string username = EncryptionManager::sha256(plainUsername);
         std::string password = EncryptionManager::sha256(plainPassword);
@@ -94,6 +101,6 @@ void Engine::sendRequest( std::vector<std::string> fileNames){
 }
 
 void Engine::sendRequest(std::string fileName, std::string fileData){
-    std::string request = fileName + static_cast<std::string>("#") + fileData;
+    std::string request = fileName + static_cast<std::string>("#") + fileData + static_cast<std::string>("#") + EncryptionManager::sha256(fileData);
     _client.sendmsg("FILE#" , request);
 }

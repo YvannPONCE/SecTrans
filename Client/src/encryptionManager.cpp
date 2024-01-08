@@ -234,3 +234,19 @@ void EncryptionManager::generateNewKey(){
     CRYPTO_cleanup_all_ex_data();
 }
 
+
+std::string EncryptionManager::sha256(const std::string& input) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256Context;
+
+    SHA256_Init(&sha256Context);
+    SHA256_Update(&sha256Context, input.c_str(), input.length());
+    SHA256_Final(hash, &sha256Context);
+
+    std::ostringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+    }
+
+    return ss.str();
+}
