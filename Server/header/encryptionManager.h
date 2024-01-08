@@ -24,6 +24,7 @@ public:
     void setClientPublicKey(std::string clientPublicKey);
     std::string encrypt(const std::string &plaintext);
     std::string decrypt(const std::string cypherText);
+    static std::string sha256(const std::string& input);
 };
 
 #endif

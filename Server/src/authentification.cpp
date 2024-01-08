@@ -20,6 +20,7 @@ bool Authentification::login(std::string username, std::string password){
     }
 }
 
+// PRIVATE
 void Authentification::registerUser(std::string username, std::string password){
     _users[username] = password;
     FileManager::createFolder(username);

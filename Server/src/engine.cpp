@@ -34,10 +34,13 @@ void Engine::processRequest(std::string request){
         std::cout << std::endl;
         std::string plainFileName = _encryptionManager.decrypt(requestParameters[2]);
 
-        if(!_authentification.login(plainUsername, plainPassword)){
+        std::string username = EncryptionManager::sha256(plainUsername);
+        std::string password = EncryptionManager::sha256(plainPassword);
+
+        if(!_authentification.login(username, password)){
             _client.sendmsg("DEND#","");
         }
-         _fileManager.registerFile(plainUsername, plainFileName, requestParameters[3]);
+         _fileManager.registerFile(username, plainFileName, requestParameters[3]);
         _client.sendmsg("SUCC#","");
            
     } else if (type == "LIST")
@@ -49,10 +52,13 @@ void Engine::processRequest(std::string request){
         std::cout << std::endl;
         std::string plainPassword = _encryptionManager.decrypt(requestParameters[1]);
 
-        if(!_authentification.login(plainUsername, plainPassword)){
+        std::string username = EncryptionManager::sha256(plainUsername);
+        std::string password = EncryptionManager::sha256(plainPassword);
+
+        if(!_authentification.login(username, password)){
             _client.sendmsg("DEND#","");
         }
-        std::vector<std::string> fileNames = FileManager::list(plainUsername);
+        std::vector<std::string> fileNames = FileManager::list(username);
         sendRequest(fileNames);
     } else if (type == "DOWN")
     {
@@ -65,12 +71,15 @@ void Engine::processRequest(std::string request){
         std::cout << std::endl;
         std::string plainFileName = _encryptionManager.decrypt(requestParameters[2]);
 
-        if(!_authentification.login(plainUsername, plainPassword)){
+        std::string username = EncryptionManager::sha256(plainUsername);
+        std::string password = EncryptionManager::sha256(plainPassword);
+
+        if(!_authentification.login(username, password)){
             _client.sendmsg("DEND#","");
         }
-        std::string cypherFileData = FileManager::readFile(plainUsername, plainFileName);
+        std::string cypherFileData = FileManager::readFile(username, plainFileName);
 
-        std::cout << std::endl;
+        std::cout << " "<<std::endl;
         std::string cypherFileName = _encryptionManager.encrypt(plainFileName);
         
         sendRequest(cypherFileName , cypherFileData);

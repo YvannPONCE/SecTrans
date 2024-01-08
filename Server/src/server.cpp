@@ -47,7 +47,7 @@ std::string Server::getRequest()
     while ((buffer = getMsg()) != "###EOF###") {
         request += buffer;
     }
-    std::cout << "Received : \n" << request << "\n"<< std::endl;
+    //std::cout << "Received : \n" << request << "\n"<< std::endl;
     return request;
 }
 

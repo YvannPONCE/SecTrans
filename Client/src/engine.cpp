@@ -96,7 +96,13 @@ void Engine::processRequest(std::string request){
     }
     else if (type == "DEND")
     {
-       exit(EXIT_FAILURE);
+        std::cout << "Wrong credentials" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    else if (type == "SUCC")
+    {
+        std::cout << "Operation succeed" << std::endl;
+        exit(EXIT_FAILURE);
     }
     else
     {

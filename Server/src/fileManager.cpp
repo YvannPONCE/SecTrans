@@ -63,7 +63,7 @@ void FileManager::registerFile(std::string username, std::string fileName, std::
         // Close the file
         outputFile.close();
 
-        std::cout << "File registered at : " << filePath << std::endl;
+        //std::cout << "File registered at : " << filePath << std::endl;
     } else {
         std::cerr << "Error opening file for writing." << std::endl;
         return; // Return an error code
