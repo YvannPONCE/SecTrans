@@ -83,7 +83,7 @@ void EncryptionManager::setServerPublicKey(std::string serverPublicKey){
 
 
 std::string EncryptionManager::encrypt(const std::string &plaintext){
-    
+
     unsigned char encryptedData[EVP_PKEY_size(_serverKeyPair)];
     EVP_PKEY_CTX *ctx;
     if(!(ctx = EVP_PKEY_CTX_new(_serverKeyPair, nullptr))) {
@@ -127,14 +127,6 @@ std::string EncryptionManager::decrypt(std::string cypherText){
 
 
 std::string EncryptionManager::unsignedCharToString(unsigned char* encryptedData, int len){
-
-    std::cout << "Cypher : \n" << std::endl;
-    for (size_t i = 0; i < 256; i++)
-    {
-        std::cout << int(encryptedData[i]) << " ";
-    }
-    std::cout << "\n" << std::endl;
-
     BIO *bio, *b64;
     BUF_MEM *bufferPtr;
 

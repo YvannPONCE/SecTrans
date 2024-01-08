@@ -107,13 +107,6 @@ std::string EncryptionManager::decrypt(std::string cypherText){
     unsigned char cypherTextUnsignedChar[EVP_PKEY_size(_keyPair)];
     charToUnsignedChar(cypherText, cypherTextUnsignedChar, EVP_PKEY_size(_keyPair));
 
-    std::cout << "Cypher : " << std::endl;
-    for (size_t i = 0; i < 256; i++)
-    {
-        std::cout << int(cypherTextUnsignedChar[i]) << " ";
-    }
-    std::cout << "\n" << std::endl;
-
     unsigned char decryptedData[EVP_PKEY_size(_keyPair)];
     EVP_PKEY_CTX *ctx;
     if(!(ctx = EVP_PKEY_CTX_new(_keyPair, nullptr))) {
@@ -163,15 +156,7 @@ std::string EncryptionManager::unsignedCharToString(unsigned char* encryptedData
 }
 
 std::string EncryptionManager::unsignedCharToReadableString(unsigned char* decryptedData, int len){
-
-    std::cout << "DecryptedData : " << std::endl;
-    for (size_t i = 0; i < 256; i++)
-    {
-        std::cout << int(decryptedData[i]) << " ";
-    }
-    std::cout << "\n" << std::endl;
-
-    return std::string(reinterpret_cast<char*>(decryptedData), len);
+    return std::string(reinterpret_cast<char*>(decryptedData));
 }
 
 void EncryptionManager::charToUnsignedChar(std::string base64Ciphertext,unsigned char* decodedCiphertext, int len){
